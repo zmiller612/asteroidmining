@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	$baseTexture "syncaidius/asteroid_01"
+	$surfaceprop "metal"
+	$bumpmap "syncaidius/asteroid_01"
+	"$nocull" 0
+	//"$phong" "1" 
+	//"$phongboost" "0.46" 
+	//"$phongfresnelranges" "[ 0 0 0]"
+	//"$phongexponent" "5"
+	"$model" 1
+}
