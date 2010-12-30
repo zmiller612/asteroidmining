@@ -1,0 +1,10 @@
+"AddonInfo"
+{
+	"name"				"LS3 Asteroid Mining Addon"
+	"version"			"1.0"
+	"up_date"			"27th December 2010"
+	"author_name"			"Syncaidius"
+	"author_email"			"syncaidius@googlemail.com"
+	"author_url"			""
+	"info"				"Adds asteroid mining and refining to LS3"
+}
