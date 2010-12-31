@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	$baseTexture "syncaidius/metal_brushed_syn"
+	$surfaceprop "metal"
+	$bumpmap "syncaidius/metal_brushed2_n"
+	"$nocull" 0
+	"$phong" "1" 
+	"$phongboost" "0.45" 
+	"$phongfresnelranges" "[ 1 5 20]"
+	"$phongexponent" "16"
+	"$model" 1
+}

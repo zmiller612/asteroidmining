@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	$baseTexture "syncaidius/refinery_abundant"
+	$surfaceprop "metal"
+}

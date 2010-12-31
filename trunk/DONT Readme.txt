@@ -22,3 +22,9 @@ AM_asteroidlimit - Sets the maximum number of asteroids allowed on the map. Be w
 AM_respawn_time - Sets the number of seconds between asteroid respawn-check cycles
 AM_respawn_count - The maximum number of asteroids allowed to respawn per cycle (this is not always reached however)
 AM_respawn_maxlife - Sets the number of minutes an asteroid can be left untouched for, before deleting itself and freeing up an asteroid spawn slot
+
+Credits/Thankies
+================
+MoSs - For helping kill any bugs and most of all, letting me test this addon on his awesome SB server: 217.79.182.184:27015
+Blaster-12 - bug/error hunter
+Anyone else who I forgot!

@@ -20,7 +20,6 @@ CAFToolSetup.SetLang("Asteroid Mining Storages","Create Storages attached to any
 TOOL.ExtraCCVars = {
 	wireamount = 0,
 	wirecapacity = 0,
-	rarity = 1,
 }
 
 function TOOL.EnableFunc()
@@ -35,25 +34,12 @@ end
 function TOOL.ExtraCCVarsCP( tool, panel )
 	panel:CheckBox( "Amount Outputs", "mining_storage_wireamount")
 	panel:CheckBox( "Capacity Outputs", "mining_storage_wirecapacity" )
-	
-	combobox = {}
-	combobox.Label = "Storage Rarity Type"
-	combobox.Description = "Storage Rarity Type"
-	combobox.MenuButton = 0
-	combobox.Options = {}
-	local raritytable = CAF.GetAddon("Asteroid Mining").rarity_levels
-	for k,v in pairs(raritytable) do
-		combobox.Options[v.name.." minerals"] = {mining_storage_rarity = k}
-	end
-	panel:AddControl("Label", {Text = "Storage Rarity Type:", Description = "Rarity"})
-	panel:AddControl("ComboBox", combobox)
 end
 
 function TOOL:GetExtraCCVars()
 	local Extra_Data = {}
 	Extra_Data.wireamount		= self:GetClientNumber("wireamount") == 1
 	Extra_Data.wirecapacity		= self:GetClientNumber("wirecapacity") == 1
-	Extra_Data.rarity			= self:GetClientNumber("rarity")
 	return Extra_Data
 end
 
@@ -92,6 +78,7 @@ local function mining_storage_rock_func(ent,type,sub_type,devinfo,Extra_Data,ent
 	
 	local mass = maxcap/1000
 	ent.mass = mass
+	ent:SetNetworkedInt("rarity_index",-1)
 	local maxhealth = math.Round(maxcap/100)
 	return mass, maxhealth
 end
@@ -103,14 +90,31 @@ local function mining_storage_ore_func(ent,type,sub_type,devinfo,Extra_Data,ent_
 		maxcap = math.floor((phys:GetVolume()*volumeMul))
 	end
 	
+	--get rarity value
+	local rarity = 1
+	if type == "mining_storage_ore_abundant" then
+		rarity = 1
+	elseif type == "mining_storage_ore_common" then
+		rarity = 2
+	elseif type == "mining_storage_ore_uncommon" then
+		rarity = 3
+	elseif type == "mining_storage_ore_rare" then
+		rarity = 4
+	elseif type == "mining_storage_ore_vrare" then
+		rarity = 5
+	elseif type == "mining_storage_ore_precious" then
+		rarity = 6
+	end
+	
 	--add refined version of asteroid resources to storage
 	local AM = CAF.GetAddon("Asteroid Mining")
 	local RD = CAF.GetAddon("Resource Distribution")
 	local reslist = AM.resources
 	local outamounts = {} --wire outputs for resource amounts
 	local outcaps = {} --wire outputs for resource capacities
+	
 	for k,v in pairs(reslist) do
-		if v.rarity == Extra_Data.rarity then
+		if v.rarity == rarity then
 			local raritylevel = AM.rarity_levels[v.rarity]
 			RD.AddResource(ent,AM.GetResourceOreName(k), math.floor((maxcap/100)*raritylevel.minPercent))
 			table.insert(outamounts,AM.GetResourceOreName(k))
@@ -123,6 +127,7 @@ local function mining_storage_ore_func(ent,type,sub_type,devinfo,Extra_Data,ent_
 
 	local mass = maxcap/1000
 	ent.mass = mass
+	ent:SetNetworkedInt("rarity_o_index",rarity)
 	local maxhealth = math.Round(maxcap/10)
 	return mass, maxhealth
 end
@@ -134,6 +139,22 @@ local function mining_storage_refined_func(ent,type,sub_type,devinfo,Extra_Data,
 		maxcap = math.floor((phys:GetVolume()*volumeMul))
 	end
 	
+	--get rarity value
+	local rarity = 1
+	if type == "mining_storage_refined_abundant" then
+		rarity = 1
+	elseif type == "mining_storage_refined_common" then
+		rarity = 2
+	elseif type == "mining_storage_refined_uncommon" then
+		rarity = 3
+	elseif type == "mining_storage_refined_rare" then
+		rarity = 4
+	elseif type == "mining_storage_refined_vrare" then
+		rarity = 5
+	elseif type == "mining_storage_refined_precious" then
+		rarity = 6
+	end
+	
 	--add refined version of asteroid resources to storage
 	local AM = CAF.GetAddon("Asteroid Mining")
 	local RD = CAF.GetAddon("Resource Distribution")
@@ -141,7 +162,7 @@ local function mining_storage_refined_func(ent,type,sub_type,devinfo,Extra_Data,
 	local outamounts = {} --wire outputs for resource amounts
 	local outcaps = {} --wire outputs for resource capacities
 	for k,v in pairs(reslist) do
-		if v.rarity == Extra_Data.rarity then
+		if v.rarity == rarity then
 			local raritylevel = AM.rarity_levels[v.rarity]
 			RD.AddResource(ent,AM.GetResourceRefinedName(k), math.floor((maxcap/100)*(raritylevel.maxPercent-raritylevel.minPercent)))
 			table.insert(outamounts,AM.GetResourceRefinedName(k))
@@ -154,6 +175,7 @@ local function mining_storage_refined_func(ent,type,sub_type,devinfo,Extra_Data,
 
 	local mass = maxcap/1000
 	ent.mass = mass
+	ent:SetNetworkedInt("rarity_index",rarity)
 	local maxhealth = math.Round(maxcap/10)
 	return mass, maxhealth
 end
@@ -186,15 +208,15 @@ TOOL.Devices = {
 			},
 		},
 	},
-	mining_storage_ore = {
-		Name	= "Ore Storages",
-		type	= "mining_storage_ore",
+	mining_storage_ore_abundant = {
+		Name	= "Ore Storage - Abundant Minerals",
+		type	= "mining_storage_ore_abundant",
 		class	= "mining_storage",
 		func	= mining_storage_ore_func,
 		devices = {
 			small_store = {
 				--EnableFunc = function() return false end,
-				Name	= "Small Tank",
+				Name	= "Small Tank (Slyfo)",
 				model	= "models/Slyfo/t-eng.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
@@ -208,65 +230,579 @@ TOOL.Devices = {
 			},
 			medium_store = {
 				--EnableFunc = function() return false end,
-				Name	= "Medium Tank (left)",
+				Name	= "Medium Tank (left, Slyfo)",
 				model	= "models/Slyfo/nacshortsleft.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
 			medium_store2 = {
 				--EnableFunc = function() return false end,
-				Name	= "Medium Tank (right)",
+				Name	= "Medium Tank (right, Slyfo)",
 				model	= "models/Slyfo/nacshortsright.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
 			large_store = {
 				--EnableFunc = function() return false end,
-				Name	= "Large Tank (Left)",
+				Name	= "Large Tank (Left, Slyfo)",
 				model	= "models/Slyfo/nacshuttleleft.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
 			large_store2 = {
 				--EnableFunc = function() return false end,
-				Name	= "Large Tank (right)",
+				Name	= "Large Tank (right, Slyfo)",
 				model	= "models/Slyfo/nacshuttleright.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
 		},
 	},
-	mining_storage_refined = {
-		Name	= "Refined Mineral Storages",
-		type	= "mining_storage_refined",
+	mining_storage_ore_common = {
+		Name	= "Ore Storage - Common Minerals",
+		type	= "mining_storage_ore_common",
 		class	= "mining_storage",
-		func	= mining_storage_refined_func,
+		func	= mining_storage_ore_func,
 		devices = {
 			small_store = {
 				--EnableFunc = function() return false end,
-				Name	= "Small Tank",
-				model	= "models/ce_ls3additional/energy_cells/energy_cell_small.mdl",
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
 			small_store2 = {
 				--EnableFunc = function() return false end,
 				Name	= "Slyfo Barrel",
-				model	= "models/Slyfo/barrel_refined.mdl",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
 			medium_store = {
 				--EnableFunc = function() return false end,
-				Name	= "Medium Tank",
-				model	= "models/ce_ls3additional/energy_cells/energy_cell_medium.mdl",
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
 			large_store = {
 				--EnableFunc = function() return false end,
-				Name	= "Large Tank",
-				model	= "models/ce_ls3additional/energy_cells/energy_cell_large.mdl",
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_ore_uncommon = {
+		Name	= "Ore Storage - Uncommon Minerals",
+		type	= "mining_storage_ore_uncommon",
+		class	= "mining_storage",
+		func	= mining_storage_ore_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_ore_rare = {
+		Name	= "Ore Storage - Rare Minerals",
+		type	= "mining_storage_ore_rare",
+		class	= "mining_storage",
+		func	= mining_storage_ore_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_ore_vrare = {
+		Name	= "Ore Storage - Very Rare Minerals",
+		type	= "mining_storage_ore_vrare",
+		class	= "mining_storage",
+		func	= mining_storage_ore_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_ore_precious = {
+		Name	= "Ore Storage - Precious Minerals",
+		type	= "mining_storage_ore_precious",
+		class	= "mining_storage",
+		func	= mining_storage_ore_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_refined_abundant = {
+		Name	= "Refined Storage - Abundant Minerals",
+		type	= "mining_storage_refined_abundant",
+		class	= "mining_storage",
+		func	= mining_storage_refined_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_refined_common = {
+		Name	= "Refined Storage - Common Minerals",
+		type	= "mining_storage_refined_common",
+		class	= "mining_storage",
+		func	= mining_storage_refined_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_refined_uncommon = {
+		Name	= "Refined Storage - Uncommon Minerals",
+		type	= "mining_storage_refined_uncommon",
+		class	= "mining_storage",
+		func	= mining_storage_refined_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_refined_rare = {
+		Name	= "Refined Storage - Rare Minerals",
+		type	= "mining_storage_refined_rare",
+		class	= "mining_storage",
+		func	= mining_storage_refined_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_refined_vrare = {
+		Name	= "Refined Storage - Very Rare Minerals",
+		type	= "mining_storage_refined_vrare",
+		class	= "mining_storage",
+		func	= mining_storage_refined_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+		},
+	},
+	mining_storage_refined_precious = {
+		Name	= "Refined Storage - Precious Minerals",
+		type	= "mining_storage_refined_precious",
+		class	= "mining_storage",
+		func	= mining_storage_refined_func,
+		devices = {
+			small_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Small Tank (Slyfo)",
+				model	= "models/Slyfo/t-eng.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			small_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Slyfo Barrel",
+				model	= "models/Slyfo/barrel_unrefined.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (left, Slyfo)",
+				model	= "models/Slyfo/nacshortsleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			medium_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Medium Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshortsright.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (Left, Slyfo)",
+				model	= "models/Slyfo/nacshuttleleft.mdl",
+				skin	= 0,
+				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+			},
+			large_store2 = {
+				--EnableFunc = function() return false end,
+				Name	= "Large Tank (right, Slyfo)",
+				model	= "models/Slyfo/nacshuttleright.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
