@@ -127,7 +127,7 @@ local function mining_storage_ore_func(ent,type,sub_type,devinfo,Extra_Data,ent_
 
 	local mass = maxcap/1000
 	ent.mass = mass
-	ent:SetNetworkedInt("rarity_o_index",rarity)
+	ent:SetNetworkedInt("rarity_index",rarity)
 	local maxhealth = math.Round(maxcap/10)
 	return mass, maxhealth
 end
