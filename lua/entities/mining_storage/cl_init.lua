@@ -37,9 +37,16 @@ function ENT:DoNormalDraw( bDontDrawModel )
 		-- 1 = default overlaytext
 		-- 2 = new overlaytext
 		
+		local rarity_index = self:GetNetworkedInt("rarity_index") or -1
+		local rarity_name = "Rock"
+		if rarity_index > 0 then 
+			Msg("Rarity Name: "..rarity_name.." - Rarity Index: "..tostring(rarity_index).."\n")
+			rarity_name = CAF.GetAddon("Asteroid Mining").rarity_levels[rarity_index].name
+		end
+			
 		if not mode or mode != 2 then
 			local OverlayText = ""
-				OverlayText = OverlayText ..self.PrintName.."\n"
+				OverlayText = OverlayText .. rarity_name.." "..self.PrintName.."\n"
 			if nettable.network == 0 then
 				OverlayText = OverlayText .. "Not connected to a network\n"
 			else
@@ -77,7 +84,7 @@ function ENT:DoNormalDraw( bDontDrawModel )
 				surface.SetFont("ConflictText")
 				surface.SetTextColor(255,255,255,255)
 				surface.SetTextPos(textStartPos+15,TempY)
-				surface.DrawText(self.PrintName)
+				surface.DrawText(rarity_name.." "..self.PrintName)
 				TempY = TempY + 70
 				
 				surface.SetFont("Flavour")

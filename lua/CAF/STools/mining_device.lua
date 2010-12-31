@@ -20,7 +20,6 @@ CAFToolSetup.SetLang("Asteroid Mining Devices","Create Storage Devices attached 
 TOOL.ExtraCCVars = {
 	mute = 0,
 	wired = 0,
-	rarity = 1,
 }
 
 function TOOL.EnableFunc()
@@ -36,18 +35,6 @@ function TOOL.ExtraCCVarsCP( tool, panel )
 	panel:CheckBox( "Mute Sound", "mining_device_mute" )
 	panel:CheckBox( "Wire Inputs/Outputs", "mining_device_wired" )
 	
-	combobox = {}
-	combobox.Label = "Storage Rarity Type"
-	combobox.Description = "Storage Rarity Type"
-	combobox.MenuButton = 0
-	combobox.Options = {}
-	local raritytable = CAF.GetAddon("Asteroid Mining").rarity_levels
-	for k,v in pairs(raritytable) do
-		combobox.Options[v.name.." minerals"] = {mining_device_rarity = k}
-	end
-	panel:AddControl("Label", {Text = "Refinery Rarity Type:", Description = "Rarity"})
-	panel:AddControl("ComboBox", combobox)
-	
 	panel:AddControl("Label", {Text = "Tip: Mining lasers will shut off if your rock ore storage is full!", Description = "A Tip"})
 	panel:AddControl("Label", {Text = "Tip: Use rock crushers to recycle/destroy rock ore.", Description = "A Tip"})
 end
@@ -56,7 +43,6 @@ function TOOL:GetExtraCCVars()
 	local Extra_Data = {}
 	Extra_Data.mute		= self:GetClientNumber("mute") == 1
 	Extra_Data.wired 	= self:GetClientNumber("wired") == 1
-	Extra_Data.rarity	= self:GetClientNumber("rarity")
 	return Extra_Data
 end
 
@@ -105,10 +91,25 @@ end
 local function mining_device_refinery_func(ent,type,sub_type,devinfo,Extra_Data,ent_extras)
 	local mass = 40
 	local AM = CAF.GetAddon("Asteroid Mining")
+	local rarity = 1
+	if type == "mining_device_ref_abundant" then
+		rarity = 1
+	elseif type == "mining_device_ref_common" then
+		rarity = 2
+	elseif type == "mining_device_ref_uncommon" then
+		rarity = 3
+	elseif type == "mining_device_ref_rare" then
+		rarity = 4
+	elseif type == "mining_device_ref_vrare" then
+		rarity = 5
+	elseif type == "mining_device_ref_precious" then
+		rarity = 6
+	end
+	
 	--add required resources to the refinery ents resource table
 	local reslist = AM.resources
 	for k,v in pairs(reslist) do
-		if v.rarity == Extra_Data.rarity then
+		if v.rarity == rarity then
 			local raritylevel = AM.rarity_levels[v.rarity]
 			RD.AddResource(ent,AM.GetResourceOreName(k), 0)
 			ent.reslist[k] = {difficulty = raritylevel.difficulty}
@@ -140,6 +141,15 @@ local function mining_device_scanner_func(ent,type,sub_type,devinfo,Extra_Data,e
 	return mass, maxhealth
 end
 
+local function mining_device_nukereactor_func(ent,type,sub_type,devinfo,Extra_Data,ent_extras)
+	CAF.GetAddon("Asteroid Mining").SetDeviceToolData(ent, Extra_Data, {"On", "Overdrive", "Mute"}, {"On"})
+
+	local mass = 70
+	ent.mass = mass
+	local maxhealth = 1200
+	return mass, maxhealth
+end
+
 TOOL.Devices = {
 	mining_device_laser = {
 		Name	= "Mining Lasers",
@@ -152,26 +162,26 @@ TOOL.Devices = {
 				Name	= "Small Laser",
 				model	= "models/Slyfo/warhead.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
 			medium_laser = {
 				Name	= "Medium Laser",
 				model	= "models/Spacebuild/cannon1_gen.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
 
 			large_laser = {
 				Name	= "Large Laser",
 				model	= "models/Slyfo/torpedo2.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
 			default_laser = {
 				Name	= "Default Laser",
 				model	= "models/props_trainstation/tracklight01.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
 		},
 	},
@@ -186,13 +196,13 @@ TOOL.Devices = {
 				Name	= "SBEP Crusher",
 				model	= "models/Cerus/Modbridge/Misc/Accessories/acc_furnace1.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
 			crusher2 = {
 				Name	= "Default",
 				model	= "models/props_industrial/oil_storage.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
 		},
 	},
@@ -207,46 +217,103 @@ TOOL.Devices = {
 				Name	= "SBEP Processor",
 				model	= "models/ce_ls3additional/water_pump/water_pump.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
 			icer2 = {
 				Name	= "Default",
 				model	= "models/props_c17/FurnitureBoiler001a.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
 		},
 	},
-	mining_device_refinery = {
-		Name	= "Ore Refineries",
-		type	= "mining_device_refinery",
+	mining_device_ref_abundant = {
+		Name	= "Refinery - Abundant Minerals",
+		type	= "mining_device_ref_abundant",
 		class	= "mining_refinery",
 		func	= mining_device_refinery_func,
 
 		devices = {
 			icer1 = {
-				Name	= "SBEP Refinery 1",
-				model	= "models/Spacebuild/emount4_fighter.mdl",
+				Name	= "Refinery",
+				model	= "models/syncaidius/mining_refinery.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
 			},
-			icer2 = {
-				Name	= "SBEP Refinery 2",
-				model	= "models/Spacebuild/dronefighter_1.mdl",
-				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+		},
+	},
+	mining_device_ref_common = {
+		Name	= "Refinery - Common Minerals",
+		type	= "mining_device_ref_common",
+		class	= "mining_refinery",
+		func	= mining_device_refinery_func,
+
+		devices = {
+			icer1 = {
+				Name	= "Refinery",
+				model	= "models/syncaidius/mining_refinery.mdl",
+				skin	= 1,
+				legacy	= false,
 			},
-			icer3 = {
-				Name	= "SBEP Refinery 3",
-				model	= "models/Cerus/Modbridge/Misc/Engines/eng_sq11b.mdl",
-				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+		},
+	},
+	mining_device_ref_uncommon = {
+		Name	= "Refinery - Uncommon Minerals",
+		type	= "mining_device_ref_uncommon",
+		class	= "mining_refinery",
+		func	= mining_device_refinery_func,
+
+		devices = {
+			icer1 = {
+				Name	= "Refinery",
+				model	= "models/syncaidius/mining_refinery.mdl",
+				skin	= 2,
+				legacy	= false,
 			},
-			icer4 = {
-				Name	= "Default",
-				model	= "models/props_wasteland/laundry_washer003.mdl",
-				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+		},
+	},
+	mining_device_ref_rare = {
+		Name	= "Refinery - Rare Minerals",
+		type	= "mining_device_ref_rare",
+		class	= "mining_refinery",
+		func	= mining_device_refinery_func,
+
+		devices = {
+			icer1 = {
+				Name	= "Refinery",
+				model	= "models/syncaidius/mining_refinery.mdl",
+				skin	= 3,
+				legacy	= false,
+			},
+		},
+	},
+	mining_device_ref_vrare = {
+		Name	= "Refinery - Very Rare Minerals",
+		type	= "mining_device_ref_vrare",
+		class	= "mining_refinery",
+		func	= mining_device_refinery_func,
+
+		devices = {
+			icer1 = {
+				Name	= "Refinery",
+				model	= "models/syncaidius/mining_refinery.mdl",
+				skin	= 4,
+				legacy	= false,
+			},
+		},
+	},
+	mining_device_ref_precious = {
+		Name	= "Refinery - Precious Minerals",
+		type	= "mining_device_ref_precious",
+		class	= "mining_refinery",
+		func	= mining_device_refinery_func,
+
+		devices = {
+			icer1 = {
+				Name	= "Refinery",
+				model	= "models/syncaidius/mining_refinery.mdl",
+				skin	= 5,
+				legacy	= false,
 			},
 		},
 	},
@@ -261,7 +328,22 @@ TOOL.Devices = {
 				Name	= "Default Scanner",
 				model	= "models/props_combine/combine_mine01.mdl",
 				skin	= 0,
-				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
+				legacy	= false,
+			},
+		},
+	},
+	mining_device_nukereactor = {
+		Name	= "Nuclear Reactors",
+		type	= "mining_device_nukereactor",
+		class	= "uranium_reactor",
+		func	= mining_device_nukereactor_func,
+
+		devices = {
+			dev1 = {
+				Name	= "Small Reactor",
+				model	= "models/syncaidius/uranium_reactor.mdl",
+				skin	= 0,
+				legacy	= false,
 			},
 		},
 	},

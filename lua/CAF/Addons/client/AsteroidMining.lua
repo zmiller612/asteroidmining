@@ -2,12 +2,12 @@ local AM = {}
 
 --rarity table which contains mining difficulty values
 AM.rarity_levels = {}
-AM.rarity_levels[1] = {name="abundant", difficulty=1}
-AM.rarity_levels[2] = {name="common", difficulty=2}
-AM.rarity_levels[3] = {name="uncommon", difficulty=4}
-AM.rarity_levels[4] = {name="rare", difficulty=6}
-AM.rarity_levels[5] = {name="very rare", difficulty=8}
-AM.rarity_levels[6] = {name="precious", difficulty=10}
+AM.rarity_levels[1] = {name="Abundant", difficulty=1}
+AM.rarity_levels[2] = {name="Common", difficulty=2}
+AM.rarity_levels[3] = {name="Uncommon", difficulty=4}
+AM.rarity_levels[4] = {name="Rare", difficulty=6}
+AM.rarity_levels[5] = {name="Very rare", difficulty=8}
+AM.rarity_levels[6] = {name="Precious", difficulty=10}
 
 local status = false
 

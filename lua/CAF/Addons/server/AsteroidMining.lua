@@ -2,7 +2,7 @@
 local AM = {}
 
 --server-side console variables
-CreateConVar( "AM_asteroidlimit", "70" )
+CreateConVar( "AM_asteroidlimit", "65" )
 CreateConVar( "AM_respawn_time", "10" )
 CreateConVar( "AM_respawn_count", "5" )
 CreateConVar( "AM_respawn_maxlife", "10" )
@@ -27,12 +27,12 @@ AM.roid_models[15] = "models/props_wasteland/rockcliff01b.mdl"
 
 --rarity table which contains mining difficulty/rarity values
 AM.rarity_levels = {}
-AM.rarity_levels[1] = {name="abundant", difficulty=1, minPercent=30, maxPercent=55}
-AM.rarity_levels[2] = {name="common", difficulty=2, minPercent=15, maxPercent=25}
-AM.rarity_levels[3] = {name="uncommon", difficulty=4, minPercent=10, maxPercent=20}
-AM.rarity_levels[4] = {name="rare", difficulty=6, minPercent=8, maxPercent=16}
-AM.rarity_levels[5] = {name="very rare", difficulty=8, minPercent=6, maxPercent=10}
-AM.rarity_levels[6] = {name="precious", difficulty=10, minPercent=1, maxPercent=7}
+AM.rarity_levels[1] = {name="Abundant", difficulty=1, minPercent=30, maxPercent=55}
+AM.rarity_levels[2] = {name="Common", difficulty=2, minPercent=15, maxPercent=25}
+AM.rarity_levels[3] = {name="Uncommon", difficulty=4, minPercent=10, maxPercent=20}
+AM.rarity_levels[4] = {name="Rare", difficulty=6, minPercent=8, maxPercent=16}
+AM.rarity_levels[5] = {name="Very rare", difficulty=8, minPercent=6, maxPercent=10}
+AM.rarity_levels[6] = {name="Precious", difficulty=10, minPercent=1, maxPercent=7}
 
 
 AM.respawn = {}
@@ -45,7 +45,7 @@ AM.respawn.maxDist = 1000 --max distance from a planet asteroids can spawn
 
 --[[asteroids containing resources with a difficulty greater than this value will
 spawn near a sun, if the map has one. Otherwise they will spawn as normal, around planets]]
-AM.respawn.sundifficulty = 8 
+AM.respawn.sundifficulty = 8 --not coded yet
 
 AM.resources = {}
 
@@ -317,15 +317,16 @@ function AM.__Construct()
 		AM.AddAsteroidResource("Iron",2,5500,8000)
 		AM.AddAsteroidResource("Titanium",3,5501, 6000)
 		AM.AddAsteroidResource("Iridium",6,6500,7000)
-		AM.AddAsteroidResource("Gold",6,0,200)
-		AM.AddAsteroidResource("Silver",6,150,300)
+		AM.AddAsteroidResource("Gold",6,0,300)
+		AM.AddAsteroidResource("Silver",6,150,390)
 		AM.AddAsteroidResource("Chromite",5,220,390)
-		AM.AddAsteroidResource("Lithium",4,391,600)
+		AM.AddAsteroidResource("Lithium",4,370,600)
 		AM.AddAsteroidResource("Aluminium",3,601,1100)
 		AM.AddAsteroidResource("Plutonium",5,5800,6000)
 		AM.AddAsteroidResource("Mercury",6,1100,1500)
 		AM.AddAsteroidResource("Copper",3,7900,8500)
-	
+		AM.AddAsteroidResource("Obsidian",6,650,700)
+		
 		AM.enabled = true
 	end
 	
@@ -342,11 +343,9 @@ function AM.GetRequiredAddons()
 	return {"Resource Distribution"}
 end
 
-
 function AM.GetStatus()
 	return status
 end
-
 
 function AM.GetVersion()
 	return 1.00, "Alpha"
