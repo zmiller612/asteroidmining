@@ -160,7 +160,7 @@ TOOL.Devices = {
 		devices = {
 			small_laser = {
 				Name	= "Small Laser",
-				model	= "models/Slyfo/warhead.mdl",
+				model	= "models/syncaidius/mining_laser.mdl",
 				skin	= 0,
 				legacy	= false,
 			},

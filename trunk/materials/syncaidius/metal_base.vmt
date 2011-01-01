@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	$baseTexture "syncaidius/metal_base"
+	$surfaceprop "metal"
+	$bumpmap "syncaidius/metal_base_n"
+	"$nocull" 0
+	"$model" 1
+}
