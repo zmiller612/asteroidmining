@@ -12,7 +12,7 @@ TOOL.CCVar_model		= "models/props_trainstation/tracklight01.mdl"
 
 TOOL.Limited			= true
 TOOL.LimitName			= "mining_device"
-TOOL.Limit				= 20
+TOOL.Limit				= 15
 
 CAFToolSetup.SetLang("Asteroid Mining Devices","Create Storage Devices attached to any surface.","Left-Click: Spawn a Device.  Reload: Repair Device.")
 
