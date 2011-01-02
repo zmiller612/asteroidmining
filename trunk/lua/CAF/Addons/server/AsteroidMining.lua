@@ -63,15 +63,10 @@ function AM.SetDeviceToolData(ent, Extra_Data, wireinputs, wireoutputs)
 	--set mute on/off
 	if Extra_Data.mute == true then ent.mute = 1 else ent.mute = 0 end
 	--apply wire inputs/outputs to entity
-	if Extra_Data.wired == true then 
-		ent.wired = 1
-		if WireLib then
-			ent.WireDebugName = ent.PrintName
-			ent.Inputs = WireLib.CreateInputs(ent, wireinputs)
-			ent.Outputs = WireLib.CreateOutputs(ent, wireoutputs) 
-		end
-	else 
-		ent.wired = 0
+	if WireLib then
+		ent.WireDebugName = ent.PrintName
+		ent.Inputs = WireLib.CreateInputs(ent, wireinputs)
+		ent.Outputs = WireLib.CreateOutputs(ent, wireoutputs) 
 	end
 end
 
@@ -80,15 +75,10 @@ function AM.SetDeviceToolSData(ent, Extra_Data, wireinputs, wireoutputs, wireout
 	--set mute on/off
 	if Extra_Data.mute == true then ent.mute = 1 else ent.mute = 0 end
 	--apply wire inputs/outputs to entity
-	if Extra_Data.wired == true then 
-		ent.wired = 1
-		if WireLib then
-			ent.WireDebugName = ent.PrintName
-			ent.Inputs = WireLib.CreateInputs(ent, wireinputs)
-			WireLib.CreateSpecialOutputs(ent, wireoutputs, wireouttypes)
-		end
-	else 
-		ent.wired = 0
+	if WireLib then
+		ent.WireDebugName = ent.PrintName
+		ent.Inputs = WireLib.CreateInputs(ent, wireinputs)
+		WireLib.CreateSpecialOutputs(ent, wireoutputs, wireouttypes)
 	end
 end
 
@@ -267,7 +257,6 @@ function AM.SpawnAsteroids()
 		end
 	end
 end
-hook.Add("InitPostEntity","AsteroidMining_SpawnRoids",timer.Simple(1,AM.SpawnAsteroids))
 
 local NextThinkTime = 0
 function AM.Think()

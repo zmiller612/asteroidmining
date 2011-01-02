@@ -100,7 +100,7 @@ function ENT:TurnOn()
 	self.Active = 1
 	self:SetOOO(1)
 	
-	if WireLib and self.wired == 1  then
+	if WireLib then
 		WireLib.TriggerOutput(self, "On", 1)
 	end
 	
@@ -114,7 +114,7 @@ function ENT:TurnOff()
 	self.overdrive = 0
 	self:SetOOO(0)
 	
-	if WireLib and self.wired == 1  then
+	if WireLib then
 		WireLib.TriggerOutput(self, "On", 0)
 	end
 	

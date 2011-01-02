@@ -5,7 +5,6 @@ include('shared.lua')
 
 local BeamLength = 512 --default beam length
 local Maxlength = 1024
-local MineRate = 55 --base amount to mine per sec
 
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
@@ -18,8 +17,9 @@ function ENT:Initialize()
 	self:SetHealth(self:GetMaxHealth())
 	
 	RD.AddResource(self,"energy",0)
-	self.econ = 400 --base energy consumption
+	self.econ = 310 --base energy consumption
 	self.energy = 0
+	self.minerate = 0
 	self.loopsound = CreateSound(self, Sound("weapons/gauss/chargeloop.wav"))
 	
 	local phys = self.Entity:GetPhysicsObject()
@@ -74,7 +74,7 @@ function ENT:TurnOn()
 		self:SetOOO(1)
 		self.loopsound:Play()
 		
-		if WireLib and self.wired == 1 then
+		if WireLib then
 			WireLib.TriggerOutput(self, "On", self.Active)
 		end
 	end
@@ -86,7 +86,7 @@ function ENT:TurnOff()
 		self.Entity:EmitSound( "weapons/physgun_off.wav" )
 		self.Active = 0
 		self:SetOOO(0)
-		if WireLib and self.wired == 1 then 
+		if WireLib then 
 			WireLib.TriggerOutput(self, "On", self.Active) 
 		end
 	end
@@ -153,7 +153,7 @@ function ENT:Mine()
 
 		if tr.Entity.asteroid then
 			for k,v in pairs(tr.Entity.resources) do
-				self:TakeFromAsteroid(tr.Entity, k, (MineRate/v.difficulty)+math.random(1,3))
+				self:TakeFromAsteroid(tr.Entity, k, (self.minerate/v.difficulty)+math.random(1,3))
 			end
 			
 			--check if the asteroid has any resources left
@@ -161,19 +161,19 @@ function ENT:Mine()
 				CAF.GetAddon("Asteroid Mining").RemoveAsteroid(tr.Entity)
 			end
 			
-			if WireLib and self.wired == 1  then
+			if WireLib then
 				WireLib.TriggerOutput(self, "Hit", 1)
 			end
 		elseif tr.Entity:IsPlayer() then
 			tr.Entity:TakeDamage(10, self:GetOwner(), self)
 			
-			if WireLib and self.wired == 1  then
+			if WireLib  then
 				WireLib.TriggerOutput(self, "Hit", 0)
 			end
 		else
 			--TODO: damage system stuff here
 			
-			if WireLib and self.wired == 1  then
+			if WireLib then
 				WireLib.TriggerOutput(self, "Hit", 0)
 			end
 		end

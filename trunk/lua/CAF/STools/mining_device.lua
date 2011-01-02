@@ -19,7 +19,6 @@ CAFToolSetup.SetLang("Asteroid Mining Devices","Create Storage Devices attached 
 
 TOOL.ExtraCCVars = {
 	mute = 0,
-	wired = 0,
 }
 
 function TOOL.EnableFunc()
@@ -33,7 +32,6 @@ end
 
 function TOOL.ExtraCCVarsCP( tool, panel )
 	panel:CheckBox( "Mute Sound", "mining_device_mute" )
-	panel:CheckBox( "Wire Inputs/Outputs", "mining_device_wired" )
 	
 	panel:AddControl("Label", {Text = "Tip: Mining lasers will shut off if your rock ore storage is full!", Description = "A Tip"})
 	panel:AddControl("Label", {Text = "Tip: Use rock crushers to recycle/destroy rock ore.", Description = "A Tip"})
@@ -42,7 +40,6 @@ end
 function TOOL:GetExtraCCVars()
 	local Extra_Data = {}
 	Extra_Data.mute		= self:GetClientNumber("mute") == 1
-	Extra_Data.wired 	= self:GetClientNumber("wired") == 1
 	return Extra_Data
 end
 
@@ -63,9 +60,25 @@ TOOL.Renamed = {
 }
 
 local function mining_device_laser_func(ent,type,sub_type,devinfo,Extra_Data,ent_extras)
+	--set mining rate and consumption
+	local sub = tostring(sub_type)
+	if sub == "small_laser" or sub == "default_laser" then
+		ent.minerate = 40
+		ent.econ = 300
+	elseif sub == "medium_laser" then
+		ent.minerate = 70
+		ent.econ = 520
+	elseif sub == "large_laser" then
+		ent.minerate = 100
+		ent.econ = 740
+	else
+		ent.minerate = 40
+		ent.econ = 310
+	end
+	
+	CAF.GetAddon("Asteroid Mining").SetDeviceToolData(ent, Extra_Data,{ "On", "Range" },{"On", "Hit"})
 	local mass = 50
 	ent.mass = mass
-	CAF.GetAddon("Asteroid Mining").SetDeviceToolData(ent, Extra_Data,{ "On", "Range" },{"On", "Hit"})
 	local maxhealth = 400
 	return mass, maxhealth
 end
@@ -166,14 +179,14 @@ TOOL.Devices = {
 			},
 			medium_laser = {
 				Name	= "Medium Laser",
-				model	= "models/Spacebuild/cannon1_gen.mdl",
+				model	= "models/syncaidius/mining_laser_m.mdl",
 				skin	= 0,
 				legacy	= false,
 			},
 
 			large_laser = {
 				Name	= "Large Laser",
-				model	= "models/Slyfo/torpedo2.mdl",
+				model	= "models/syncaidius/mining_laser_l.mdl",
 				skin	= 0,
 				legacy	= false,
 			},
