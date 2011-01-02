@@ -15,7 +15,6 @@ function ENT:Initialize()
 	self.range = 512
 	self.energy = 0
 	self.mute = 0
-	self.wired = 1
 	self.roidres = 0
 	self.hit = 0
 	self.beeptime = 15
@@ -35,7 +34,7 @@ function ENT:TurnOn()
 		self:Detect()
 		self:UpdateOutput()
 		
-		if WireLib and self.wired == 1 then
+		if WireLib then
 			WireLib.TriggerOutput(self, "On", 1)
 		end
 		
@@ -52,7 +51,7 @@ function ENT:TurnOff(beep)
 		self:UpdateOutput()
 		self.beeptime = 15
 		
-		if WireLib and self.wired == 1 then
+		if WireLib then
 			WireLib.TriggerOutput(self, "On", 0)
 			WireLib.TriggerOutput(self, "Yield", 0)
 			WireLib.TriggerOutput(self, "Hit", 0)
@@ -147,7 +146,7 @@ function ENT:Detect()
 				end
 				
 				--output resource array
-				if WireLib and self.wired == 1 then
+				if WireLib then
 					WireLib.TriggerOutput( self, "Detected Resources", temp)
 				end
 			end
@@ -156,7 +155,7 @@ function ENT:Detect()
 			self.hit = 0
 			self.lasthit = nil
 			
-			if WireLib and self.wired == 1 then
+			if WireLib then
 				WireLib.TriggerOutput( self, "Detected Resources", {} )
 			end
 		end
@@ -170,7 +169,7 @@ function ENT:Detect()
 	end
 	
 	--output wire stuff
-	if WireLib and self.wired == 1 then
+	if WireLib then
 		WireLib.TriggerOutput(self, "On", 0)
 		WireLib.TriggerOutput(self, "Hit", self.hit)
 		WireLib.TriggerOutput(self, "Yield", self.roidres)

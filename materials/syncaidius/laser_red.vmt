@@ -2,7 +2,7 @@
 {
 	"$baseTexture" "syncaidius/laser_red"
 	"$bumpmap" "syncaidius/laser_red_n"
-	"$nocull" 1
+	"$nocull" 0
 	"$phong" "1" 
 	"$phongboost" "0.35" 
 	"$phongfresnelranges" "[ 1 5 20]"
