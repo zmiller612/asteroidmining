@@ -12,7 +12,7 @@ TOOL.CCVar_model		= "models/props_wasteland/laundry_basket001.mdl"
 
 TOOL.Limited			= true
 TOOL.LimitName			= "mining_storage"
-TOOL.Limit				= 20
+TOOL.Limit				= 15
 
 CAFToolSetup.SetLang("Asteroid Mining Storages","Create Storages attached to any surface.","Left-Click: Spawn a Storage.  Reload: Repair Storage.")
 
