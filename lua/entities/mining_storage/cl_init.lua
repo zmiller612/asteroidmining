@@ -40,7 +40,6 @@ function ENT:DoNormalDraw( bDontDrawModel )
 		local rarity_index = self:GetNetworkedInt("rarity_index") or -1
 		local rarity_name = "Rock"
 		if rarity_index > 0 then 
-			Msg("Rarity Name: "..rarity_name.." - Rarity Index: "..tostring(rarity_index).."\n")
 			rarity_name = CAF.GetAddon("Asteroid Mining").rarity_levels[rarity_index].name
 		end
 			
