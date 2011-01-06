@@ -56,7 +56,7 @@ AM.ready = false
 
 AM.language = {}
 AM.language.refined = "Refined"
-AM.language.ore = "ore"
+AM.language.ore = "Ore"
 
 --Helper function for asteroid mining-based device CAF STools
 function AM.SetDeviceToolData(ent, Extra_Data, wireinputs, wireoutputs)
@@ -77,7 +77,9 @@ function AM.SetDeviceToolSData(ent, Extra_Data, wireinputs, wireoutputs, wireout
 	--apply wire inputs/outputs to entity
 	if WireLib then
 		ent.WireDebugName = ent.PrintName
-		ent.Inputs = WireLib.CreateInputs(ent, wireinputs)
+		if wireinputs != nil then
+			ent.Inputs = WireLib.CreateInputs(ent, wireinputs)
+		end
 		WireLib.CreateSpecialOutputs(ent, wireoutputs, wireouttypes)
 	end
 end
@@ -242,6 +244,7 @@ function AM.SpawnAsteroids()
 				--this might happen if none of the resource rarity ranges were hit
 				if aent.totalResources > 0 then
 					aent.lastrescheck = aent.totalResources
+					aent.spawnpos = pos --store its own spawn pos, in case its moved via exploitation
 					
 					--add new asteroid to asteroid table
 					AM.asteroids[aent:EntIndex()] = aent

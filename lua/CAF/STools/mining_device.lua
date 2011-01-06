@@ -163,6 +163,67 @@ local function mining_device_nukereactor_func(ent,type,sub_type,devinfo,Extra_Da
 	return mass, maxhealth
 end
 
+local function mining_device_dispenserhp_func(ent,type,sub_type,devinfo,Extra_Data,ent_extras)
+	CAF.GetAddon("Asteroid Mining").SetDeviceToolSData(ent, Extra_Data, nil, {"Last User", "Charges", "Max Charges"}, {"ENTITY", "NORMAL", "NORMAL"})
+
+	local sub = tostring(sub_type)
+	if sub == "small_hpdispenser" then
+		ent.maxcharges = 5
+		ent.econ = 165
+		ent.ircon = 51
+		ent.ocon = 51
+	elseif sub == "large_hpdispenser" then
+		ent.maxcharges = 10
+		ent.econ = 320
+		ent.ircon = 100
+		ent.ocon = 100
+	else --if someone uses hax, give them a crap dispenser :P
+		ent.maxcharges = 1
+		ent.econ = 500
+		ent.ircon = 200
+		ent.ocon = 200
+	end
+	
+	--send max charges now, then it never needs sending again
+	ent:SetNWInt("mining_disp_maxcharges",ent.maxcharges)
+	if WireLib then 
+		WireLib.TriggerOutput(ent,"Max Charges", ent.maxcharges)
+	end
+	
+	local mass = 30
+	ent.mass = mass
+	local maxhealth = 400
+	return mass, maxhealth
+end
+
+local function mining_device_dispenserarm_func(ent,type,sub_type,devinfo,Extra_Data,ent_extras)
+	CAF.GetAddon("Asteroid Mining").SetDeviceToolSData(ent, Extra_Data, nil, {"Last User", "Charges", "Max Charges"}, {"ENTITY", "NORMAL", "NORMAL"})
+
+	local sub = tostring(sub_type)
+	if sub == "armdispenser" then
+		ent.maxcharges = 15
+		ent.econ = 450
+		ent.ircon = 70
+		ent.ocon = 70
+	else --if someone uses hax, give them a crap dispenser :P
+		ent.maxcharges = 1
+		ent.econ = 500
+		ent.ircon = 200
+		ent.ocon = 200
+	end
+	
+	--send max charges now, then it never needs sending again
+	ent:SetNWInt("mining_disparm_maxcharges",ent.maxcharges)
+	if WireLib then 
+		WireLib.TriggerOutput(ent,"Max Charges", ent.maxcharges)
+	end
+	
+	local mass = 30
+	ent.mass = mass
+	local maxhealth = 400
+	return mass, maxhealth
+end
+
 TOOL.Devices = {
 	mining_device_laser = {
 		Name	= "Mining Lasers",
@@ -355,6 +416,42 @@ TOOL.Devices = {
 			dev1 = {
 				Name	= "Small Reactor",
 				model	= "models/syncaidius/uranium_reactor.mdl",
+				skin	= 0,
+				legacy	= false,
+			},
+		},
+	},
+	mining_device_dispenserhp = {
+		Name	= "Health Dispenser",
+		type	= "mining_device_dispenserhp",
+		class	= "dispenser_health",
+		func	= mining_device_dispenserhp_func,
+
+		devices = {
+			small_hpdispenser = {
+				Name	= "Small Dispenser",
+				model	= "models/Items/HealthKit.mdl",
+				skin	= 0,
+				legacy	= false,
+			},
+			large_hpdispenser = {
+				Name	= "Large Dispenser",
+				model	= "models/props_combine/health_charger001.mdl",
+				skin	= 0,
+				legacy	= false,
+			},
+		},
+	},
+	mining_device_dispenserarm = {
+		Name	= "Armor Dispenser",
+		type	= "mining_device_dispenserarm",
+		class	= "dispenser_armor",
+		func	= mining_device_dispenserarm_func,
+
+		devices = {
+			armdispenser = {
+				Name	= "Large Dispenser",
+				model	= "models/props_combine/suit_charger001.mdl",
 				skin	= 0,
 				legacy	= false,
 			},
