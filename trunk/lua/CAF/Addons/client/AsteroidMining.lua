@@ -9,67 +9,57 @@ AM.rarity_levels[4] = {name="Rare", difficulty=6}
 AM.rarity_levels[5] = {name="Very rare", difficulty=8}
 AM.rarity_levels[6] = {name="Precious", difficulty=10}
 
+AM.language = {}
+AM.language.refined = "Refined"
+AM.language.ore = "Ore"
+
 local status = false
 
+--returns given resource name with ore keyword appended to it
+function AM.GetResourceOreName(res)
+	return res.." "..AM.language.ore
+end
+
+--returns given resource name with refined keyword inserted at the start
+function AM.GetResourceRefinedName(res)
+	return AM.language.refined.." "..res
+end
+
 --The Class
-/**
-	The Constructor for this Custom Addon Class
-*/
 function AM.__Construct()
 	status = true
 	return true , "Not Implementation yet"
 end
 
-/**
-	The Destructor for this Custom Addon Class
-*/
 function AM.__Destruct()
 	return false , "Can't disable"
 end
 
-/**
-	Get the required Addons for this Addon Class
-*/
 function AM.GetRequiredAddons()
 	return {"Resource Distribution"}
 end
 
-/**
-	Get the Boolean Status from this Addon Class
-*/
 function AM.GetStatus()
 	return status
 end
 
-/**
-	Get the Version of this Custom Addon Class
-*/
 function AM.GetVersion()
 	return 1.0, "Release"
 end
 
-/**
-	Get any custom options this Custom Addon Class might have
-*/
 function AM.GetExtraOptions()
 	return {}
 end
 
-/**
-	Gets a menu from this Custom Addon Class
-*/
 function AM.GetMenu(menutype, menuname)//Name is nil for main menu, String for others
 	local data = {}
 	return data
 end
 
-/**
-	Get the Custom String Status from this Addon Class
-*/
 function AM.GetCustomStatus()
 	return "Implemented"
 end
 
-CAF.RegisterAddon("Asteroid Mining", AM, "2")
+CAF.RegisterAddon("Asteroid Mining", AM, "3")
 
 

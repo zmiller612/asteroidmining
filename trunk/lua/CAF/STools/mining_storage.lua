@@ -524,7 +524,7 @@ TOOL.Devices = {
 			small_store2 = {
 				--EnableFunc = function() return false end,
 				Name	= "Slyfo Barrel",
-				model	= "models/Slyfo/barrel_unrefined.mdl",
+				model	= "models/Slyfo/barrel_refined.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
@@ -574,7 +574,7 @@ TOOL.Devices = {
 			small_store2 = {
 				--EnableFunc = function() return false end,
 				Name	= "Slyfo Barrel",
-				model	= "models/Slyfo/barrel_unrefined.mdl",
+				model	= "models/Slyfo/barrel_refined.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
@@ -624,7 +624,7 @@ TOOL.Devices = {
 			small_store2 = {
 				--EnableFunc = function() return false end,
 				Name	= "Slyfo Barrel",
-				model	= "models/Slyfo/barrel_unrefined.mdl",
+				model	= "models/Slyfo/barrel_refined.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
@@ -674,7 +674,7 @@ TOOL.Devices = {
 			small_store2 = {
 				--EnableFunc = function() return false end,
 				Name	= "Slyfo Barrel",
-				model	= "models/Slyfo/barrel_unrefined.mdl",
+				model	= "models/Slyfo/barrel_refined.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
@@ -724,7 +724,7 @@ TOOL.Devices = {
 			small_store2 = {
 				--EnableFunc = function() return false end,
 				Name	= "Slyfo Barrel",
-				model	= "models/Slyfo/barrel_unrefined.mdl",
+				model	= "models/Slyfo/barrel_refined.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},
@@ -774,7 +774,7 @@ TOOL.Devices = {
 			small_store2 = {
 				--EnableFunc = function() return false end,
 				Name	= "Slyfo Barrel",
-				model	= "models/Slyfo/barrel_unrefined.mdl",
+				model	= "models/Slyfo/barrel_refined.mdl",
 				skin	= 0,
 				legacy	= false, --these two vars must be defined per ent as the old tanks (defined in external file) require different values
 			},

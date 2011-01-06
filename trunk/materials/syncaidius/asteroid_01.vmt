@@ -2,7 +2,7 @@
 {
 	$baseTexture "syncaidius/asteroid_01"
 	$surfaceprop "metal"
-	$bumpmap "syncaidius/asteroid_01_n"
+	$bumpmap "syncaidius/asteroid_n"
 	"$nocull" 0
 	"$model" 1
 }

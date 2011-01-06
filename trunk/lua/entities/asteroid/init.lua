@@ -23,6 +23,7 @@ function ENT:Initialize()
 	self.lastrescheck = 0 --how many resources were there last time the asteroid checked?
 	self.maxcap = 0
 	self.lifetime = 0
+	self.spawnpos = Vector(0,0,0)
 end
 
 function ENT:AddResource(res)
@@ -61,6 +62,11 @@ function ENT:Think()
 		else
 			CAF.GetAddon("Asteroid Mining").RemoveAsteroid(self)
 		end
+	end
+	
+	--check if the asteroid was moved (exploited)
+	if self:GetPos() != self.spawnpos then
+		self:SetPos(self.spawnpos)
 	end
 	
 	self.Entity:NextThink( CurTime() + 10)
