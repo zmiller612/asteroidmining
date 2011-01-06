@@ -63,7 +63,7 @@ function ENT:UpdateWireOutputs()
 		
 		if self.wirecapacity == 1 then
 			for k,v in pairs(restable) do
-				WireLib.TriggerOutput(self, k, self:GetResourceAmount(k))
+				WireLib.TriggerOutput(self, k.." Capacity", self:GetNetworkCapacity(k))
 			end
 		end
 	end
