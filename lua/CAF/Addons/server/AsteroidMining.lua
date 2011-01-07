@@ -53,6 +53,7 @@ AM.asteroidCount = 0
 AM.spawns = {}
 AM.stars = {} --stars could be used for spawning the really difficult resources (risk of frying your ship etc).
 AM.ready = false
+local status = false
 
 AM.language = {}
 AM.language.refined = "Refined"
@@ -133,9 +134,9 @@ difficulty affects how fast a resource can be mined and whether or not
 it will spawn around any stars if the map has any.
 Rarity = rarity class the resource is part of (e.g. 1 - 5)
 rMin and rMax = the rarity range (sort of like a chance of spawning range)]]
-function AM.AddAsteroidResource(res, Rarity, rMin, rMax)
+function AM.AddAsteroidResource(res, Rarity, rMin, rMax, Value)
 	if not AM.rarity_levels[Rarity] then Rarity = 3 end --set rarity to default if this happens
-	AM.resources[res] = {rarity=Rarity, rarityMin=rMin, rarityMax=rMax, difficulty=AM.rarity_levels[Rarity]}
+	AM.resources[res] = {rarity=Rarity, rarityMin=rMin, rarityMax=rMax, difficulty=AM.rarity_levels[Rarity], value=Value}
 end
 
 --adds a new model to the table of possible asteroid models
@@ -275,7 +276,7 @@ hook.Add("Think", "AsteroidMining_ThinkyStuff", AM.Think)
 
 function AM.__Construct()
 	if status then return false, "Already Active!" end
-	if not CAF.GetAddon("Resource Distribution") or not CAF.GetAddon("Resource Distribution").GetStatus() then return false, "Resource Distribution is Required and needs to be Active!" end
+	if not CAF.GetAddon("Resource Distribution") or not CAF.GetAddon("Resource Distribution").GetStatus() then return false, "Resource Distribution is required and needs to be Active!" end
 	
 	--locate all planets and stars on the map to use as spawn points
 	--should of checked if SB had a way to retrieve its own planet list really, before coding this.
@@ -304,30 +305,33 @@ function AM.__Construct()
 	--make sure the map actually has some planets/stars to use before enabling
 	if table.Count(AM.spawns) > 0 or table.Count(AM.stars) > 0 then
 		--setup standard asteroid resources ready for use
-		AM.AddAsteroidResource("Ice",1,2000,5000)
-		AM.AddAsteroidResource("Uranium",3,5001,6000)
-		AM.AddAsteroidResource("Iron",2,5500,8000)
-		AM.AddAsteroidResource("Titanium",3,5501, 6000)
-		AM.AddAsteroidResource("Iridium",6,6500,7000)
-		AM.AddAsteroidResource("Gold",6,0,300)
-		AM.AddAsteroidResource("Silver",6,150,390)
-		AM.AddAsteroidResource("Chromite",5,220,390)
-		AM.AddAsteroidResource("Lithium",4,370,600)
-		AM.AddAsteroidResource("Aluminium",3,601,1100)
-		AM.AddAsteroidResource("Plutonium",5,5800,6000)
-		AM.AddAsteroidResource("Mercury",6,1100,1500)
-		AM.AddAsteroidResource("Copper",3,7900,8500)
-		AM.AddAsteroidResource("Obsidian",6,650,700)
+		AM.AddAsteroidResource("Ice",1,2000,5000,5)
+		AM.AddAsteroidResource("Uranium",3,5001,6000,12)
+		AM.AddAsteroidResource("Iron",2,5500,8000,8)
+		AM.AddAsteroidResource("Titanium",3,5501, 6000,11)
+		AM.AddAsteroidResource("Iridium",6,6500,7000,16)
+		AM.AddAsteroidResource("Gold",6,0,300,70)
+		AM.AddAsteroidResource("Silver",6,150,490,65)
+		AM.AddAsteroidResource("Platinum",6,90,230,85)
+		AM.AddAsteroidResource("Chromite",5,220,390,75)
+		AM.AddAsteroidResource("Lithium",4,370,700,47)
+		AM.AddAsteroidResource("Aluminium",3,601,1100,14)
+		AM.AddAsteroidResource("Plutonium",5,5800,6000,27)
+		AM.AddAsteroidResource("Mercury",6,1100,1500, 15)
+		AM.AddAsteroidResource("Copper",3,7900,8500, 14)
+		AM.AddAsteroidResource("Obsidian",6,750,800, 99)
 		
 		AM.enabled = true
 	end
 	
+	status = true
 	return true
 end
 
 function AM.__Destruct()
 	--TODO: remove asteroids on disable/destruct.
-	--TODO: set AM.ready to false and return true
+	AM.enabled = false
+	status = false
 	return false
 end
 
@@ -361,11 +365,6 @@ end
 	You can send all the files from here that you want to add to send to the client
 */
 function AM.AddResourcesToSend()
-	
-end
-
---[[ Asteroid destruction call, called when an asteroid is destroyed from being hit or over mined.]]
-function AM.Destruct( class,id,pos,type,reason,volumename )
 	
 end
 

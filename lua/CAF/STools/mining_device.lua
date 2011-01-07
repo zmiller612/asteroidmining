@@ -404,6 +404,12 @@ TOOL.Devices = {
 				skin	= 0,
 				legacy	= false,
 			},
+			dev2 = {
+				Name	= "Default Scanner 2",
+				model	= "MoSs: models/jaanus/wiretool/wiretool_beamcaster.mdl",
+				skin	= 0,
+				legacy	= false,
+			},
 		},
 	},
 	mining_device_nukereactor = {
