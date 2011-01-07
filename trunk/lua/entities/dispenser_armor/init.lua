@@ -66,10 +66,19 @@ end
 function ENT:Dispense(ply)
 	if self.charges > 0 then
 		if ply:IsPlayer() == true then --just to be sure
-			if ply:Armor() != 100 then
+			local maxa = 0
+			--check if the players armour was set by AMRP
+			if ply.maxamor then
+				maxa = ply.maxarmor
+			else
+				maxa = 100
+			end
+			
+			--give armor
+			if ply:Armor() != maxa then
 				--cap armor recharge between 0 to 10hp
-				local armor = 100 - ply:Armor()
-				if armor > 10 then armor = 10 end
+				local armor = maxa - ply:Armor()
+				if armor > 20 then armor = 20 end
 				if armor < 0 then armor = 0 end
 				ply:SetArmor(ply:Armor() + armor)
 				
@@ -78,7 +87,7 @@ function ENT:Dispense(ply)
 				--update Network stuff
 				self.charges = self.charges - 1
 				self:SetNWInt( "mining_disparm_charges", self.charges or 0)
-			end
+			end	
 		end
 	else
 		self:EmitSound("items/suitchargeno1.wav")

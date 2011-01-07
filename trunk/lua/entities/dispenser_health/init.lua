@@ -66,9 +66,9 @@ end
 function ENT:Dispense(ply)
 	if self.charges > 0 then
 		if ply:IsPlayer() == true then --just to be sure
-			if ply:Health() != 100 then
+			if ply:Health() != ply:GetMaxHealth() then
 				--cap health recharge between 0 to 10hp
-				local health = 100 - ply:Health()
+				local health = ply:GetMaxHealth() - ply:Health()
 				if health > 10 then health = 10 end
 				if health < 0 then health = 0 end
 				ply:SetHealth(ply:Health() + health)
