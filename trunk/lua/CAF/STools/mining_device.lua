@@ -12,7 +12,7 @@ TOOL.CCVar_model		= "models/props_trainstation/tracklight01.mdl"
 
 TOOL.Limited			= true
 TOOL.LimitName			= "mining_device"
-TOOL.Limit				= 15
+TOOL.Limit				= 20
 
 CAFToolSetup.SetLang("Asteroid Mining Devices","Create Storage Devices attached to any surface.","Left-Click: Spawn a Device.  Reload: Repair Device.")
 
@@ -401,12 +401,6 @@ TOOL.Devices = {
 			dev1 = {
 				Name	= "Default Scanner",
 				model	= "models/props_combine/combine_mine01.mdl",
-				skin	= 0,
-				legacy	= false,
-			},
-			dev2 = {
-				Name	= "Default Scanner 2",
-				model	= "MoSs: models/jaanus/wiretool/wiretool_beamcaster.mdl",
 				skin	= 0,
 				legacy	= false,
 			},
