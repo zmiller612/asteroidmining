@@ -257,7 +257,7 @@ function AM.SpawnAsteroids()
 			
 			--update asteroid count
 			AM.asteroidCount = AM.asteroidCount + spawned
-			Msg("ASTEROID MINING: "..tostring(spawned).." asteroids spawned. Total: "..tostring(AM.asteroidCount).."/"..tostring(server_settings.Int("AM_asteroidlimit")).."\n")
+			--Msg("ASTEROID MINING: "..tostring(spawned).." asteroids spawned. Total: "..tostring(AM.asteroidCount).."/"..tostring(server_settings.Int("AM_asteroidlimit")).."\n")
 		end
 	end
 end
