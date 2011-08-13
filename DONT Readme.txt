@@ -25,6 +25,5 @@ AM_respawn_maxlife - Sets the number of minutes an asteroid can be left untouche
 
 Credits/Thankies
 ================
-MoSs - For helping kill any bugs and most of all, letting me test this addon on his awesome SB server: 217.79.182.184:27015
 Blaster-12 - bug/error hunter
 Anyone else who I forgot!
