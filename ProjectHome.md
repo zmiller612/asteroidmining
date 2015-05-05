@@ -1,0 +1,1 @@
+An custom asteroid mining addon for SB3/LS3 by Syncaidius, for use with Garry's Mod Spacebuild gamemode/addon.
